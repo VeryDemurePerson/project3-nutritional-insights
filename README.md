@@ -1,5 +1,4 @@
-# Project 2: Nutritional Insights Application with Frontend, Backend, and Continuous Deployment
-
+# Project 3: Enhanced Nutritional Insights with Security, OAuth & Cloud Management
 **Author:** Lai Nhat Duong Phan  
 **Date:** November 2025  
 **Course:** Cloud Computing (CPSY 300)
