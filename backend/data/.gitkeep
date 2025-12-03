@@ -1,0 +1,11 @@
+# Data Directory
+
+Place `All_Diets.csv` from Project 1 in this directory.
+
+The CSV file should be:
+- File name: `All_Diets.csv`
+- File size: ~703 KB
+- Total records: 7,806 recipes
+- Columns: Diet_type, Recipe_name, Cuisine_type, Protein(g), Carbs(g), Fat(g)
+
+**Important:** Do not commit the CSV file to git (it's in .gitignore).

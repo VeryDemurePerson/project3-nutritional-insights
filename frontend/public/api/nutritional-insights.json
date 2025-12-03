@@ -1,0 +1,39 @@
+{
+  "success": true,
+  "total_recipes": 7806,
+  "diet_types": [
+    "paleo",
+    "vegan",
+    "keto",
+    "mediterranean",
+    "dash"
+  ],
+  "average_macronutrients": {
+    "paleo": {
+      "protein_g": 88.67476452119301,
+      "carbs_g": 129.55212715855558,
+      "fat_g": 135.66902668759806
+    },
+    "vegan": {
+      "protein_g": 56.15703022339031,
+      "carbs_g": 254.0041918528255,
+      "fat_g": 103.2996780551905
+    },
+    "keto": {
+      "protein_g": 101.26650793650806,
+      "carbs_g": 57.97057539682544,
+      "fat_g": 153.11635582010592
+    },
+    "mediterranean": {
+      "protein_g": 101.11231602966336,
+      "carbs_g": 152.9055447803767,
+      "fat_g": 101.41613804905879
+    },
+    "dash": {
+      "protein_g": 69.28227507163328,
+      "carbs_g": 160.53575358166194,
+      "fat_g": 101.1505616045847
+    }
+  },
+  "timestamp": "2025-11-19T00:00:00.000Z"
+}

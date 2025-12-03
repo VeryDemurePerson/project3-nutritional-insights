@@ -1,0 +1,569 @@
+{
+  "success": true,
+  "clusters": {
+    "paleo": {
+      "american": {
+        "count": 535,
+        "avg_protein": 90.5161495327103,
+        "avg_carbs": 147.4659813084114,
+        "avg_fat": 144.37848598130861
+      },
+      "south east asian": {
+        "count": 29,
+        "avg_protein": 124.41517241379309,
+        "avg_carbs": 179.5303448275862,
+        "avg_fat": 101.87758620689655
+      },
+      "mexican": {
+        "count": 48,
+        "avg_protein": 93.37270833333334,
+        "avg_carbs": 86.83270833333331,
+        "avg_fat": 110.45208333333335
+      },
+      "chinese": {
+        "count": 26,
+        "avg_protein": 107.99846153846153,
+        "avg_carbs": 70.41115384615384,
+        "avg_fat": 81.69538461538463
+      },
+      "mediterranean": {
+        "count": 106,
+        "avg_protein": 81.22122641509434,
+        "avg_carbs": 84.42103773584908,
+        "avg_fat": 140.81820754716983
+      },
+      "italian": {
+        "count": 171,
+        "avg_protein": 94.09771929824562,
+        "avg_carbs": 126.05116959064327,
+        "avg_fat": 138.51801169590647
+      },
+      "french": {
+        "count": 154,
+        "avg_protein": 74.36149350649355,
+        "avg_carbs": 138.91857142857143,
+        "avg_fat": 143.15902597402592
+      },
+      "indian": {
+        "count": 9,
+        "avg_protein": 155.76222222222222,
+        "avg_carbs": 86.12333333333333,
+        "avg_fat": 161.17555555555555
+      },
+      "nordic": {
+        "count": 45,
+        "avg_protein": 103.17844444444447,
+        "avg_carbs": 51.23066666666666,
+        "avg_fat": 116.78555555555556
+      },
+      "eastern europe": {
+        "count": 27,
+        "avg_protein": 95.70111111111112,
+        "avg_carbs": 106.00222222222222,
+        "avg_fat": 137.7040740740741
+      },
+      "central europe": {
+        "count": 9,
+        "avg_protein": 42.84888888888889,
+        "avg_carbs": 169.60222222222222,
+        "avg_fat": 129.65666666666664
+      },
+      "kosher": {
+        "count": 2,
+        "avg_protein": 51.714999999999996,
+        "avg_carbs": 247.565,
+        "avg_fat": 105.92
+      },
+      "british": {
+        "count": 54,
+        "avg_protein": 66.73240740740741,
+        "avg_carbs": 185.51425925925926,
+        "avg_fat": 138.0211111111111
+      },
+      "caribbean": {
+        "count": 6,
+        "avg_protein": 82.74166666666667,
+        "avg_carbs": 70.495,
+        "avg_fat": 50.53
+      },
+      "south american": {
+        "count": 21,
+        "avg_protein": 57.60476190476191,
+        "avg_carbs": 108.28285714285717,
+        "avg_fat": 97.54714285714284
+      },
+      "middle eastern": {
+        "count": 12,
+        "avg_protein": 144.42249999999999,
+        "avg_carbs": 74.14166666666667,
+        "avg_fat": 148.24166666666667
+      },
+      "asian": {
+        "count": 12,
+        "avg_protein": 78.385,
+        "avg_carbs": 95.13,
+        "avg_fat": 62.72666666666667
+      },
+      "japanese": {
+        "count": 5,
+        "avg_protein": 76.88,
+        "avg_carbs": 21.78,
+        "avg_fat": 83.762
+      },
+      "world": {
+        "count": 3,
+        "avg_protein": 3.3699999999999997,
+        "avg_carbs": 78.09666666666666,
+        "avg_fat": 0.63
+      }
+    },
+    "vegan": {
+      "american": {
+        "count": 925,
+        "avg_protein": 53.745091891891946,
+        "avg_carbs": 267.72755675675677,
+        "avg_fat": 110.60405405405395
+      },
+      "asian": {
+        "count": 67,
+        "avg_protein": 73.19373134328357,
+        "avg_carbs": 181.7007462686567,
+        "avg_fat": 84.84537313432834
+      },
+      "italian": {
+        "count": 81,
+        "avg_protein": 63.92493827160495,
+        "avg_carbs": 244.3296296296296,
+        "avg_fat": 78.75172839506176
+      },
+      "french": {
+        "count": 76,
+        "avg_protein": 48.083289473684225,
+        "avg_carbs": 239.10802631578946,
+        "avg_fat": 99.1230263157895
+      },
+      "british": {
+        "count": 27,
+        "avg_protein": 46.27592592592592,
+        "avg_carbs": 286.03999999999996,
+        "avg_fat": 115.70851851851855
+      },
+      "japanese": {
+        "count": 24,
+        "avg_protein": 39.77541666666667,
+        "avg_carbs": 193.55208333333334,
+        "avg_fat": 92.19916666666666
+      },
+      "south east asian": {
+        "count": 46,
+        "avg_protein": 70.04239130434782,
+        "avg_carbs": 255.38826086956527,
+        "avg_fat": 101.82782608695652
+      },
+      "central europe": {
+        "count": 4,
+        "avg_protein": 75.045,
+        "avg_carbs": 390.205,
+        "avg_fat": 58.8575
+      },
+      "mediterranean": {
+        "count": 99,
+        "avg_protein": 60.29474747474746,
+        "avg_carbs": 223.59747474747465,
+        "avg_fat": 90.80757575757573
+      },
+      "eastern europe": {
+        "count": 4,
+        "avg_protein": 49.7825,
+        "avg_carbs": 185.92,
+        "avg_fat": 124.17249999999999
+      },
+      "nordic": {
+        "count": 9,
+        "avg_protein": 142.0088888888889,
+        "avg_carbs": 266.3688888888889,
+        "avg_fat": 122.0988888888889
+      },
+      "south american": {
+        "count": 31,
+        "avg_protein": 58.288387096774194,
+        "avg_carbs": 283.0087096774193,
+        "avg_fat": 152.35064516129034
+      },
+      "mexican": {
+        "count": 38,
+        "avg_protein": 62.184210526315816,
+        "avg_carbs": 269.4165789473683,
+        "avg_fat": 74.52447368421052
+      },
+      "world": {
+        "count": 10,
+        "avg_protein": 17.466999999999995,
+        "avg_carbs": 133.70100000000002,
+        "avg_fat": 34.342
+      },
+      "chinese": {
+        "count": 17,
+        "avg_protein": 44.387647058823525,
+        "avg_carbs": 144.4617647058824,
+        "avg_fat": 61.42176470588236
+      },
+      "indian": {
+        "count": 48,
+        "avg_protein": 59.28229166666668,
+        "avg_carbs": 216.395,
+        "avg_fat": 82.83541666666667
+      },
+      "middle eastern": {
+        "count": 15,
+        "avg_protein": 56.52466666666667,
+        "avg_carbs": 240.0486666666666,
+        "avg_fat": 62.307999999999986
+      },
+      "caribbean": {
+        "count": 1,
+        "avg_protein": 55.36,
+        "avg_carbs": 1063.72,
+        "avg_fat": 621.42
+      }
+    },
+    "keto": {
+      "american": {
+        "count": 663,
+        "avg_protein": 100.15696832579194,
+        "avg_carbs": 59.575263951734556,
+        "avg_fat": 165.33885369532427
+      },
+      "mediterranean": {
+        "count": 89,
+        "avg_protein": 89.3958426966292,
+        "avg_carbs": 41.58123595505617,
+        "avg_fat": 118.00876404494387
+      },
+      "french": {
+        "count": 163,
+        "avg_protein": 84.99521472392641,
+        "avg_carbs": 61.4766871165644,
+        "avg_fat": 169.1420858895707
+      },
+      "british": {
+        "count": 90,
+        "avg_protein": 78.53433333333331,
+        "avg_carbs": 55.13800000000001,
+        "avg_fat": 144.59999999999997
+      },
+      "asian": {
+        "count": 11,
+        "avg_protein": 125.12999999999998,
+        "avg_carbs": 166.84545454545454,
+        "avg_fat": 97.01727272727273
+      },
+      "south east asian": {
+        "count": 34,
+        "avg_protein": 126.29088235294115,
+        "avg_carbs": 114.28235294117648,
+        "avg_fat": 154.8447058823529
+      },
+      "italian": {
+        "count": 234,
+        "avg_protein": 122.23166666666663,
+        "avg_carbs": 54.77431623931624,
+        "avg_fat": 156.04910256410255
+      },
+      "nordic": {
+        "count": 35,
+        "avg_protein": 122.51657142857142,
+        "avg_carbs": 28.135428571428577,
+        "avg_fat": 120.3217142857143
+      },
+      "mexican": {
+        "count": 60,
+        "avg_protein": 103.8341666666667,
+        "avg_carbs": 50.634499999999996,
+        "avg_fat": 136.46216666666663
+      },
+      "japanese": {
+        "count": 10,
+        "avg_protein": 85.829,
+        "avg_carbs": 52.71199999999999,
+        "avg_fat": 115.38399999999999
+      },
+      "eastern europe": {
+        "count": 11,
+        "avg_protein": 117.87727272727275,
+        "avg_carbs": 37.657272727272726,
+        "avg_fat": 132.24818181818182
+      },
+      "caribbean": {
+        "count": 7,
+        "avg_protein": 50.43142857142857,
+        "avg_carbs": 32.27285714285714,
+        "avg_fat": 100.71142857142857
+      },
+      "south american": {
+        "count": 21,
+        "avg_protein": 110.52523809523811,
+        "avg_carbs": 52.97380952380953,
+        "avg_fat": 107.35857142857147
+      },
+      "central europe": {
+        "count": 11,
+        "avg_protein": 165.29272727272726,
+        "avg_carbs": 97.36454545454544,
+        "avg_fat": 257.36909090909086
+      },
+      "chinese": {
+        "count": 38,
+        "avg_protein": 96.99868421052632,
+        "avg_carbs": 59.68947368421053,
+        "avg_fat": 85.9678947368421
+      },
+      "world": {
+        "count": 6,
+        "avg_protein": 2.723333333333333,
+        "avg_carbs": 29.94666666666667,
+        "avg_fat": 6.338333333333334
+      },
+      "middle eastern": {
+        "count": 17,
+        "avg_protein": 97.30411764705883,
+        "avg_carbs": 37.376470588235286,
+        "avg_fat": 123.02588235294115
+      },
+      "indian": {
+        "count": 12,
+        "avg_protein": 86.50166666666667,
+        "avg_carbs": 39.53,
+        "avg_fat": 146.96249999999998
+      }
+    },
+    "mediterranean": {
+      "mediterranean": {
+        "count": 1274,
+        "avg_protein": 95.23270015698583,
+        "avg_carbs": 141.39927001569887,
+        "avg_fat": 94.93153846153858
+      },
+      "nordic": {
+        "count": 31,
+        "avg_protein": 134.31129032258067,
+        "avg_carbs": 118.03258064516129,
+        "avg_fat": 116.63741935483871
+      },
+      "italian": {
+        "count": 148,
+        "avg_protein": 120.31351351351357,
+        "avg_carbs": 241.39378378378382,
+        "avg_fat": 128.16222972972966
+      },
+      "asian": {
+        "count": 12,
+        "avg_protein": 125.35083333333334,
+        "avg_carbs": 233.39916666666667,
+        "avg_fat": 98.40333333333335
+      },
+      "french": {
+        "count": 61,
+        "avg_protein": 117.92229508196722,
+        "avg_carbs": 162.3126229508197,
+        "avg_fat": 122.31868852459012
+      },
+      "mexican": {
+        "count": 17,
+        "avg_protein": 127.9435294117647,
+        "avg_carbs": 206.5964705882353,
+        "avg_fat": 112.40294117647058
+      },
+      "american": {
+        "count": 145,
+        "avg_protein": 113.27117241379312,
+        "avg_carbs": 160.46558620689643,
+        "avg_fat": 111.72841379310347
+      },
+      "middle eastern": {
+        "count": 26,
+        "avg_protein": 89.85,
+        "avg_carbs": 156.75076923076924,
+        "avg_fat": 134.70576923076925
+      },
+      "indian": {
+        "count": 3,
+        "avg_protein": 161.25,
+        "avg_carbs": 172.51,
+        "avg_fat": 151.50333333333333
+      },
+      "south american": {
+        "count": 10,
+        "avg_protein": 111.01499999999999,
+        "avg_carbs": 151.76899999999998,
+        "avg_fat": 105.99100000000001
+      },
+      "south east asian": {
+        "count": 8,
+        "avg_protein": 97.27374999999999,
+        "avg_carbs": 94.89375,
+        "avg_fat": 115.91125
+      },
+      "caribbean": {
+        "count": 1,
+        "avg_protein": 60.36,
+        "avg_carbs": 137.21,
+        "avg_fat": 69.17
+      },
+      "world": {
+        "count": 6,
+        "avg_protein": 9.913333333333332,
+        "avg_carbs": 121.15166666666666,
+        "avg_fat": 12.99
+      },
+      "british": {
+        "count": 4,
+        "avg_protein": 151.6525,
+        "avg_carbs": 79.44500000000001,
+        "avg_fat": 105.32000000000001
+      },
+      "eastern europe": {
+        "count": 3,
+        "avg_protein": 67.12,
+        "avg_carbs": 138.61333333333334,
+        "avg_fat": 62.343333333333334
+      },
+      "central europe": {
+        "count": 1,
+        "avg_protein": 255.46,
+        "avg_carbs": 81.7,
+        "avg_fat": 166.3
+      },
+      "chinese": {
+        "count": 1,
+        "avg_protein": 128.29,
+        "avg_carbs": 324.19,
+        "avg_fat": 135.9
+      },
+      "japanese": {
+        "count": 2,
+        "avg_protein": 318.4,
+        "avg_carbs": 80.215,
+        "avg_fat": 250.255
+      }
+    },
+    "dash": {
+      "american": {
+        "count": 639,
+        "avg_protein": 77.71442879499224,
+        "avg_carbs": 204.91517996870107,
+        "avg_fat": 133.83813771517987
+      },
+      "french": {
+        "count": 150,
+        "avg_protein": 69.04626666666665,
+        "avg_carbs": 167.7882,
+        "avg_fat": 96.06259999999999
+      },
+      "world": {
+        "count": 234,
+        "avg_protein": 1.0547435897435897,
+        "avg_carbs": 19.892692307692315,
+        "avg_fat": 2.041495726495726
+      },
+      "mediterranean": {
+        "count": 176,
+        "avg_protein": 78.39511363636363,
+        "avg_carbs": 117.15698863636356,
+        "avg_fat": 102.57096590909087
+      },
+      "italian": {
+        "count": 165,
+        "avg_protein": 101.52393939393936,
+        "avg_carbs": 205.04163636363646,
+        "avg_fat": 122.15381818181817
+      },
+      "british": {
+        "count": 64,
+        "avg_protein": 60.7240625,
+        "avg_carbs": 270.09609375,
+        "avg_fat": 114.49828124999999
+      },
+      "indian": {
+        "count": 20,
+        "avg_protein": 60.683000000000014,
+        "avg_carbs": 134.046,
+        "avg_fat": 76.2895
+      },
+      "nordic": {
+        "count": 32,
+        "avg_protein": 150.4996875,
+        "avg_carbs": 200.12625000000003,
+        "avg_fat": 145.32125000000002
+      },
+      "chinese": {
+        "count": 38,
+        "avg_protein": 98.54710526315789,
+        "avg_carbs": 138.51868421052632,
+        "avg_fat": 110.39368421052632
+      },
+      "south east asian": {
+        "count": 31,
+        "avg_protein": 68.23709677419356,
+        "avg_carbs": 133.75225806451613,
+        "avg_fat": 116.72806451612901
+      },
+      "south american": {
+        "count": 54,
+        "avg_protein": 52.864629629629626,
+        "avg_carbs": 135.17481481481485,
+        "avg_fat": 63.64444444444445
+      },
+      "eastern europe": {
+        "count": 10,
+        "avg_protein": 51.411,
+        "avg_carbs": 132.305,
+        "avg_fat": 51.992000000000004
+      },
+      "mexican": {
+        "count": 61,
+        "avg_protein": 91.97377049180326,
+        "avg_carbs": 158.0775409836066,
+        "avg_fat": 99.1660655737705
+      },
+      "middle eastern": {
+        "count": 21,
+        "avg_protein": 61.28238095238095,
+        "avg_carbs": 117.33476190476189,
+        "avg_fat": 73.54476190476191
+      },
+      "central europe": {
+        "count": 9,
+        "avg_protein": 48.32,
+        "avg_carbs": 180.9711111111111,
+        "avg_fat": 113.79222222222221
+      },
+      "japanese": {
+        "count": 9,
+        "avg_protein": 78.36555555555556,
+        "avg_carbs": 152.2111111111111,
+        "avg_fat": 88.3577777777778
+      },
+      "caribbean": {
+        "count": 3,
+        "avg_protein": 142.68666666666667,
+        "avg_carbs": 59.64333333333334,
+        "avg_fat": 104.43666666666667
+      },
+      "asian": {
+        "count": 24,
+        "avg_protein": 89.09750000000001,
+        "avg_carbs": 188.95541666666665,
+        "avg_fat": 96.63
+      },
+      "kosher": {
+        "count": 5,
+        "avg_protein": 67.296,
+        "avg_carbs": 139.316,
+        "avg_fat": 114.12600000000002
+      }
+    }
+  },
+  "total_clusters": 92,
+  "timestamp": "2025-11-19T00:00:00.000Z"
+}
