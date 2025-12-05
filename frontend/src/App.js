@@ -6,8 +6,11 @@ import {
   ResponsiveContainer
 } from 'recharts';
 
-// Tự động nhận diện môi trường: Azure (production) hoặc Local
-const API_BASE_URL = process.env.REACT_APP_API_URL || '/api';
+// --- CẤU HÌNH SERVER ---
+// Địa chỉ gốc của Server Azure
+const SERVER_URL = "https://project3-backend-nutritional-bqhpd8ggbze8dhcj.canadacentral-01.azurewebsites.net";
+// Địa chỉ cho các API lấy dữ liệu (có thêm /api)
+const API_BASE_URL = `${SERVER_URL}/api`;
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
@@ -41,7 +44,8 @@ function App() {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`${API_BASE_URL}/nutritional-insights.json`);
+      // Đã sửa: Xóa đuôi .json
+      const response = await fetch(`${API_BASE_URL}/nutritional-insights`);
       if (!response.ok) throw new Error('Network response was not ok');
       const data = await response.json();
       setNutritionalData(data);
@@ -58,8 +62,8 @@ function App() {
     setLoading(true);
     setError(null);
     try {
-      // FIX: Dùng API_BASE_URL thay vì localhost
-      const response = await fetch(`${API_BASE_URL}/recipes?limit=10000`);
+      // Đã sửa: Giảm limit xuống 100 để không bị timeout
+      const response = await fetch(`${API_BASE_URL}/recipes?limit=100`);
       if (!response.ok) throw new Error('Network response was not ok');
       const data = await response.json();
       setRecipesData(data);
@@ -80,7 +84,7 @@ function App() {
 
     setLoading(true);
     try {
-      // FIX: Dùng API_BASE_URL
+      // Endpoint này giữ nguyên logic cũ
       const response = await fetch(`${API_BASE_URL}/2fa/verify`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -114,7 +118,8 @@ function App() {
     setLoading(true);
     setError(null);
     try {
-      await fetch(`${API_BASE_URL}/clusters.json`);
+      // Đã sửa: Xóa đuôi .json
+      await fetch(`${API_BASE_URL}/clusters`);
       showNotification('Clusters data loaded successfully!', 'success');
     } catch (err) {
       setError('Failed to fetch clusters');
@@ -553,7 +558,8 @@ function App() {
                 <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
                   <button
                     onClick={() => {
-                      window.location.href = `${API_BASE_URL}/auth/google`;
+                      // Đã sửa: Dùng SERVER_URL (gốc) cho Auth
+                      window.location.href = `${SERVER_URL}/auth/google`;
                       localStorage.setItem('pendingOAuth', 'google');
                     }}
                     style={{
@@ -571,7 +577,8 @@ function App() {
                   </button>
                   <button
                     onClick={() => {
-                      window.location.href = `${API_BASE_URL}/auth/github`;
+                      // Đã sửa: Dùng SERVER_URL (gốc) cho Auth
+                      window.location.href = `${SERVER_URL}/auth/github`;
                       localStorage.setItem('pendingOAuth', 'github');
                     }}
                     style={{
