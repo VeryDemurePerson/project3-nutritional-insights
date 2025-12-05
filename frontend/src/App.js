@@ -13,7 +13,6 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 function App() {
   const [selectedDietType, setSelectedDietType] = useState('All Diet Types');
   const [searchTerm, setSearchTerm] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
   const [nutritionalData, setNutritionalData] = useState(null);
   const [recipesData, setRecipesData] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -22,6 +21,7 @@ function App() {
   const [showTwoFactorModal, setShowTwoFactorModal] = useState(false);
   const [twoFactorCode, setTwoFactorCode] = useState('');
   const [tempToken, setTempToken] = useState('');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
 
   const dietTypes = ['All Diet Types', 'Vegan', 'Keto', 'Mediterranean', 'Dash', 'Paleo'];
