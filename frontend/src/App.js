@@ -13,6 +13,8 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 function App() {
   const [selectedDietType, setSelectedDietType] = useState('All Diet Types');
   const [searchTerm, setSearchTerm] = useState('');
+
+  // Da xoa currentPage de fix loi unused-vars
   const [nutritionalData, setNutritionalData] = useState(null);
   const [recipesData, setRecipesData] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -21,8 +23,9 @@ function App() {
   const [showTwoFactorModal, setShowTwoFactorModal] = useState(false);
   const [twoFactorCode, setTwoFactorCode] = useState('');
   const [tempToken, setTempToken] = useState('');
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
+  // Da them state nay de fix loi ReferenceError
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const dietTypes = ['All Diet Types', 'Vegan', 'Keto', 'Mediterranean', 'Dash', 'Paleo'];
 
@@ -512,6 +515,7 @@ function App() {
         </div>
 
         {/* OAuth & 2FA Integration */}
+        {/* ADDED: Use isAuthenticated to hide/show login section */}
         <div style={{
           margin: '40px 0',
           padding: '30px',
@@ -521,94 +525,125 @@ function App() {
         }}>
           <h2 style={{ color: '#6B46C1', marginBottom: '20px' }}>OAuth & 2FA Integration</h2>
 
-          <div style={{ marginTop: '20px' }}>
-            <h3 style={{ fontSize: '18px', marginBottom: '15px' }}>Secure Login</h3>
-            <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
+          {isAuthenticated ? (
+            // Show this if Logged In
+            <div style={{
+              padding: '20px',
+              background: '#F0FFF4',
+              border: '1px solid #C6F6D5',
+              borderRadius: '8px',
+              textAlign: 'center'
+            }}>
+              <h3 style={{ color: '#2F855A' }}>✓ Authenticated Successfully</h3>
+              <p>You have secure access to the system resources.</p>
               <button
-                onClick={() => {
-                  localStorage.setItem('pendingOAuth', 'google');
-                  window.location.href = 'http://localhost:5000/auth/google';
-                }}
+                onClick={() => setIsAuthenticated(false)}
                 style={{
-                  padding: '12px 24px',
-                  background: '#4285F4',
+                  marginTop: '15px',
+                  padding: '10px 20px',
+                  background: '#C53030',
                   color: 'white',
                   border: 'none',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  fontSize: '16px',
-                  fontWeight: '500'
+                  borderRadius: '6px',
+                  cursor: 'pointer'
                 }}
               >
-                Login with Google
-              </button>
-              <button
-                onClick={() => {
-                  localStorage.setItem('pendingOAuth', 'github');
-                  window.location.href = 'http://localhost:5000/auth/github';
-                }}
-                style={{
-                  padding: '12px 24px',
-                  background: '#333',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  fontSize: '16px',
-                  fontWeight: '500'
-                }}
-              >
-                Login with GitHub
+                Logout
               </button>
             </div>
-          </div>
+          ) : (
+            // Show this if NOT Logged In
+            <>
+              <div style={{ marginTop: '20px' }}>
+                <h3 style={{ fontSize: '18px', marginBottom: '15px' }}>Secure Login</h3>
+                <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
+                  <button
+                    onClick={() => {
+                      localStorage.setItem('pendingOAuth', 'google');
+                      window.location.href = 'http://localhost:5000/auth/google';
+                    }}
+                    style={{
+                      padding: '12px 24px',
+                      background: '#4285F4',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      fontSize: '16px',
+                      fontWeight: '500'
+                    }}
+                  >
+                    Login with Google
+                  </button>
+                  <button
+                    onClick={() => {
+                      localStorage.setItem('pendingOAuth', 'github');
+                      window.location.href = 'http://localhost:5000/auth/github';
+                    }}
+                    style={{
+                      padding: '12px 24px',
+                      background: '#333',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      fontSize: '16px',
+                      fontWeight: '500'
+                    }}
+                  >
+                    Login with GitHub
+                  </button>
+                </div>
+              </div>
 
-          <div style={{ marginTop: '30px' }}>
-            <h3 style={{ fontSize: '18px', marginBottom: '15px' }}>Setup 2FA</h3>
-            <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
-              <button
-                onClick={async () => {
-                  try {
-                    const response = await fetch('http://localhost:5000/api/2fa/generate', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({
-                        userId: 'user-oauth',
-                        userEmail: 'your-email@example.com'
-                      })
-                    });
-                    const data = await response.json();
+              <div style={{ marginTop: '30px' }}>
+                <h3 style={{ fontSize: '18px', marginBottom: '15px' }}>Setup 2FA</h3>
+                <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+                  <button
+                    onClick={async () => {
+                      try {
+                        const response = await fetch('http://localhost:5000/api/2fa/generate', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            userId: 'user-oauth',
+                            userEmail: 'your-email@example.com'
+                          })
+                        });
+                        const data = await response.json();
 
-                    const qrWindow = window.open('', '_blank', 'width=400,height=500');
-                    qrWindow.document.write(`
-                      <html>
-                        <head><title>2FA QR Code</title></head>
-                        <body style="text-align: center; padding: 20px; font-family: Arial;">
-                          <h2>Scan with Google Authenticator</h2>
-                          <img src="${data.qrCode}" style="width: 300px; height: 300px;" />
-                          <p>Secret: ${data.secret}</p>
-                        </body>
-                      </html>
-                    `);
-                  } catch (err) {
-                    alert('Failed to generate QR code');
-                  }
-                }}
-                style={{
-                  padding: '12px 24px',
-                  background: '#6B46C1',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  fontSize: '16px',
-                  fontWeight: '500'
-                }}
-              >
-                Generate QR Code
-              </button>
-            </div>
-          </div>
+                        const qrWindow = window.open('', '_blank', 'width=400,height=500');
+                        qrWindow.document.write(`
+                          <html>
+                            <head><title>2FA QR Code</title></head>
+                            <body style="text-align: center; padding: 20px; font-family: Arial;">
+                              <h2>Scan with Google Authenticator</h2>
+                              <img src="${data.qrCode}" style="width: 300px; height: 300px;" />
+                              <p>Secret: ${data.secret}</p>
+                            </body>
+                          </html>
+                        `);
+                      } catch (err) {
+                        alert('Failed to generate QR code');
+                      }
+                    }}
+                    style={{
+                      padding: '12px 24px',
+                      background: '#6B46C1',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      fontSize: '16px',
+                      fontWeight: '500'
+                    }}
+                  >
+                    Generate QR Code
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Cloud Resource Cleanup */}
