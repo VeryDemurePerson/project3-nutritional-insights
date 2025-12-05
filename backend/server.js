@@ -4,6 +4,7 @@ const fs = require('fs');
 const csv = require('csv-parser');
 const path = require('path');
 require('dotenv').config();
+
 // Import new middleware and routes for Project 3
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
@@ -119,18 +120,15 @@ function calculateAverageMacros(data) {
 }
 
 // Health check endpoint
-app.get('/api/health'
-  , (req, res) => {
-    res.json({
-      status: 'OK',
-      message: 'Nutritional Insights API is running',
-      timestamp: new Date().toISOString(),
-      data_loaded: dietData.length > 0,
-      total_recipes: dietData.length
-    });
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'OK',
+    message: 'Nutritional Insights API is running',
+    timestamp: new Date().toISOString(),
+    data_loaded: dietData.length > 0,
+    total_recipes: dietData.length
   });
-
-
+});
 
 // API Endpoint 1: Get Nutritional Insights
 app.get('/api/nutritional-insights', (req, res) => {
@@ -290,7 +288,29 @@ app.get('/api/clusters', (req, res) => {
   }
 });
 
-// 404 handler
+// ==========================================
+// THÊM ROUTE NÀY ĐỂ TRANG CHỦ KHÔNG BỊ LỖI
+// ==========================================
+app.get('/', (req, res) => {
+  res.send(`
+    <div style="font-family: sans-serif; padding: 20px; text-align: center;">
+      <h1>🥗 Nutritional Insights API is Running!</h1>
+      <p>Server status: <strong>Online</strong></p>
+      <div style="margin-top: 20px; text-align: left; display: inline-block;">
+        <h3>Available Endpoints:</h3>
+        <ul>
+          <li><a href="/api/health">/api/health</a> - Check Server Status</li>
+          <li><a href="/api/recipes">/api/recipes</a> - Get Recipes</li>
+          <li><a href="/api/nutritional-insights?diet_type=all">/api/nutritional-insights</a></li>
+          <li><a href="/api/clusters">/api/clusters</a></li>
+          <li><a href="/api/azure/resources">/api/azure/resources</a></li>
+        </ul>
+      </div>
+    </div>
+  `);
+});
+
+// 404 handler (Giữ nguyên, nằm dưới route '/')
 app.use((req, res) => {
   res.status(404).json({
     success: false,
@@ -314,6 +334,7 @@ loadCSVData()
       console.log('='.repeat(70));
       console.log(`Server running on http://localhost:${PORT}`);
       console.log(`API endpoints available:`);
+      console.log(`  - GET /`);
       console.log(`  - GET /api/health`);
       console.log(`  - GET /api/nutritional-insights`);
       console.log(`  - GET /api/recipes`);
