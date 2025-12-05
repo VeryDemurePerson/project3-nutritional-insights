@@ -6,6 +6,7 @@ import {
   ResponsiveContainer
 } from 'recharts';
 
+// Tự động nhận diện môi trường: Azure (production) hoặc Local
 const API_BASE_URL = process.env.REACT_APP_API_URL || '/api';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
@@ -14,7 +15,6 @@ function App() {
   const [selectedDietType, setSelectedDietType] = useState('All Diet Types');
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Da xoa currentPage de fix loi unused-vars
   const [nutritionalData, setNutritionalData] = useState(null);
   const [recipesData, setRecipesData] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -23,11 +23,18 @@ function App() {
   const [showTwoFactorModal, setShowTwoFactorModal] = useState(false);
   const [twoFactorCode, setTwoFactorCode] = useState('');
   const [tempToken, setTempToken] = useState('');
-
-  // Da them state nay de fix loi ReferenceError
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
+  // State mới để thay thế alert() bằng thông báo đẹp hơn
+  const [notification, setNotification] = useState(null);
+
   const dietTypes = ['All Diet Types', 'Vegan', 'Keto', 'Mediterranean', 'Dash', 'Paleo'];
+
+  // Helper để hiện thông báo thay cho alert
+  const showNotification = (message, type = 'info') => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 3000);
+  };
 
   // Fetch nutritional insights
   const fetchNutritionalInsights = async () => {
@@ -35,6 +42,7 @@ function App() {
     setError(null);
     try {
       const response = await fetch(`${API_BASE_URL}/nutritional-insights.json`);
+      if (!response.ok) throw new Error('Network response was not ok');
       const data = await response.json();
       setNutritionalData(data);
     } catch (err) {
@@ -45,16 +53,18 @@ function App() {
     }
   };
 
-  // Fetch recipes - get ALL recipes (no pagination limit)
+  // Fetch recipes
   const fetchRecipes = async () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`http://localhost:5000/api/recipes?limit=10000`);
+      // FIX: Dùng API_BASE_URL thay vì localhost
+      const response = await fetch(`${API_BASE_URL}/recipes?limit=10000`);
+      if (!response.ok) throw new Error('Network response was not ok');
       const data = await response.json();
       setRecipesData(data);
     } catch (err) {
-      setError('Failed to fetch recipes');
+      setError('Failed to fetch recipes. Ensure Backend is running.');
       console.error(err);
     } finally {
       setLoading(false);
@@ -64,13 +74,14 @@ function App() {
   // Verify 2FA code
   const verify2FA = async () => {
     if (twoFactorCode.length !== 6) {
-      alert('Please enter a 6-digit code');
+      showNotification('Please enter a 6-digit code', 'error');
       return;
     }
 
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/2fa/verify', {
+      // FIX: Dùng API_BASE_URL
+      const response = await fetch(`${API_BASE_URL}/2fa/verify`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -82,17 +93,16 @@ function App() {
       const data = await response.json();
 
       if (data.success && data.verified) {
-        // 2FA verified! Save token and authenticate
         localStorage.setItem('authToken', tempToken);
         setIsAuthenticated(true);
         setShowTwoFactorModal(false);
         setTwoFactorCode('');
-        alert('Successfully authenticated with 2FA!');
+        showNotification('Successfully authenticated with 2FA!', 'success');
       } else {
-        alert('Invalid 2FA code. Please try again.');
+        showNotification('Invalid 2FA code. Please try again.', 'error');
       }
     } catch (err) {
-      alert('2FA verification failed');
+      showNotification('2FA verification failed', 'error');
       console.error(err);
     } finally {
       setLoading(false);
@@ -105,7 +115,7 @@ function App() {
     setError(null);
     try {
       await fetch(`${API_BASE_URL}/clusters.json`);
-      alert('Clusters data loaded successfully!');
+      showNotification('Clusters data loaded successfully!', 'success');
     } catch (err) {
       setError('Failed to fetch clusters');
       console.error(err);
@@ -120,20 +130,18 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Filter recipes when data, searchTerm, or selectedDietType changes
+  // Filter recipes logic
   useEffect(() => {
     if (!recipesData?.recipes) return;
 
     let filtered = recipesData.recipes;
 
-    // Filter by diet type
     if (selectedDietType !== 'All Diet Types') {
       filtered = filtered.filter(recipe =>
         recipe.diet_type === selectedDietType.toLowerCase()
       );
     }
 
-    // Filter by search term
     if (searchTerm.trim()) {
       filtered = filtered.filter(recipe =>
         recipe.recipe_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -145,24 +153,21 @@ function App() {
     setFilteredRecipes(filtered);
   }, [recipesData, searchTerm, selectedDietType]);
 
-  // Handle OAuth callback and show 2FA modal
+  // Handle OAuth callback
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('token');
     const pendingOAuth = localStorage.getItem('pendingOAuth');
 
     if (token && pendingOAuth) {
-      // OAuth successful, now require 2FA
       setTempToken(token);
       setShowTwoFactorModal(true);
       localStorage.removeItem('pendingOAuth');
-
-      // Clean URL
       window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, []);
 
-  // Prepare chart data
+  // Chart preparation functions
   const prepareBarChartData = () => {
     if (!nutritionalData) return [];
     return Object.entries(nutritionalData.average_macronutrients || {}).map(([diet, values]) => ({
@@ -203,19 +208,32 @@ function App() {
 
   return (
     <div className="App">
-      {/* Header */}
+      {/* Notification Toast */}
+      {notification && (
+        <div style={{
+          position: 'fixed',
+          top: '20px',
+          right: '20px',
+          padding: '15px 25px',
+          background: notification.type === 'error' ? '#E53E3E' : '#38A169',
+          color: 'white',
+          borderRadius: '8px',
+          boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+          zIndex: 2000,
+          animation: 'slideIn 0.3s ease-out'
+        }}>
+          {notification.message}
+        </div>
+      )}
+
       <header className="app-header">
         <h1>Nutritional Insights</h1>
       </header>
 
-      {/* Main Content */}
       <div className="main-content">
-        {/* Explore Section */}
         <section className="explore-section">
           <h2>Explore Nutritional Insights</h2>
-
           <div className="charts-grid">
-            {/* Bar Chart */}
             <div className="chart-card">
               <h3>Bar Chart</h3>
               <p>Average macronutrient content by diet type.</p>
@@ -232,8 +250,6 @@ function App() {
                 </BarChart>
               </ResponsiveContainer>
             </div>
-
-            {/* Scatter Plot */}
             <div className="chart-card">
               <h3>Scatter Plot</h3>
               <p>Nutrient relationships (e.g., protein vs carbs).</p>
@@ -247,8 +263,6 @@ function App() {
                 </ScatterChart>
               </ResponsiveContainer>
             </div>
-
-            {/* Heatmap */}
             <div className="chart-card">
               <h3>Heatmap</h3>
               <p>Nutrient correlations.</p>
@@ -265,8 +279,6 @@ function App() {
                 </BarChart>
               </ResponsiveContainer>
             </div>
-
-            {/* Pie Chart */}
             <div className="chart-card">
               <h3>Pie Chart</h3>
               <p>Recipe distribution by diet type.</p>
@@ -293,10 +305,8 @@ function App() {
           </div>
         </section>
 
-        {/* Filters Section */}
         <section className="filters-section">
           <h2>Filters and Data Interaction</h2>
-
           <div className="filter-controls">
             <input
               type="text"
@@ -305,7 +315,6 @@ function App() {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="search-input"
             />
-
             <div className="dropdown">
               <button className="dropdown-button">
                 {selectedDietType} ▼
@@ -325,10 +334,8 @@ function App() {
           </div>
         </section>
 
-        {/* API Interaction Section */}
         <section className="api-section">
           <h2>API Data Interaction</h2>
-
           <div className="api-buttons">
             <button
               onClick={fetchNutritionalInsights}
@@ -364,7 +371,6 @@ function App() {
           )}
         </section>
 
-        {/* Filtered Recipes Display */}
         <section className="recipes-section" style={{
           margin: '40px 0',
           padding: '30px',
@@ -373,17 +379,13 @@ function App() {
           boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
         }}>
           <h2>Filtered Recipes ({filteredRecipes.length})</h2>
-
           {loading && <p>Loading recipes...</p>}
-
           {error && <p style={{ color: '#E53E3E' }}>{error}</p>}
-
           {!loading && filteredRecipes.length === 0 && (
             <p style={{ color: '#718096', textAlign: 'center', padding: '20px' }}>
               No recipes found. Try different filters or click "Get Recipes" button.
             </p>
           )}
-
           {filteredRecipes.length > 0 && (
             <div style={{
               display: 'grid',
@@ -451,7 +453,6 @@ function App() {
               ))}
             </div>
           )}
-
           {filteredRecipes.length > 12 && (
             <p style={{
               textAlign: 'center',
@@ -463,7 +464,6 @@ function App() {
           )}
         </section>
 
-        {/* Security & Compliance Section */}
         <div style={{
           margin: '40px 0',
           padding: '30px',
@@ -472,7 +472,6 @@ function App() {
           boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
         }}>
           <h2 style={{ color: '#6B46C1', marginBottom: '20px' }}>Security & Compliance</h2>
-
           <div style={{ marginTop: '20px' }}>
             <h3 style={{ fontSize: '18px', marginBottom: '15px' }}>Security Status</h3>
             <div style={{
@@ -514,8 +513,6 @@ function App() {
           </div>
         </div>
 
-        {/* OAuth & 2FA Integration */}
-        {/* ADDED: Use isAuthenticated to hide/show login section */}
         <div style={{
           margin: '40px 0',
           padding: '30px',
@@ -524,9 +521,7 @@ function App() {
           boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
         }}>
           <h2 style={{ color: '#6B46C1', marginBottom: '20px' }}>OAuth & 2FA Integration</h2>
-
           {isAuthenticated ? (
-            // Show this if Logged In
             <div style={{
               padding: '20px',
               background: '#F0FFF4',
@@ -552,15 +547,14 @@ function App() {
               </button>
             </div>
           ) : (
-            // Show this if NOT Logged In
             <>
               <div style={{ marginTop: '20px' }}>
                 <h3 style={{ fontSize: '18px', marginBottom: '15px' }}>Secure Login</h3>
                 <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
                   <button
                     onClick={() => {
+                      window.location.href = `${API_BASE_URL}/auth/google`;
                       localStorage.setItem('pendingOAuth', 'google');
-                      window.location.href = 'http://localhost:5000/auth/google';
                     }}
                     style={{
                       padding: '12px 24px',
@@ -577,8 +571,8 @@ function App() {
                   </button>
                   <button
                     onClick={() => {
+                      window.location.href = `${API_BASE_URL}/auth/github`;
                       localStorage.setItem('pendingOAuth', 'github');
-                      window.location.href = 'http://localhost:5000/auth/github';
                     }}
                     style={{
                       padding: '12px 24px',
@@ -602,7 +596,7 @@ function App() {
                   <button
                     onClick={async () => {
                       try {
-                        const response = await fetch('http://localhost:5000/api/2fa/generate', {
+                        const response = await fetch(`${API_BASE_URL}/2fa/generate`, {
                           method: 'POST',
                           headers: { 'Content-Type': 'application/json' },
                           body: JSON.stringify({
@@ -624,7 +618,7 @@ function App() {
                           </html>
                         `);
                       } catch (err) {
-                        alert('Failed to generate QR code');
+                        showNotification('Failed to generate QR code', 'error');
                       }
                     }}
                     style={{
@@ -646,7 +640,6 @@ function App() {
           )}
         </div>
 
-        {/* Cloud Resource Cleanup */}
         <div style={{
           margin: '40px 0',
           padding: '30px',
@@ -655,13 +648,11 @@ function App() {
           boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
         }}>
           <h2 style={{ color: '#6B46C1', marginBottom: '20px' }}>Cloud Resource Cleanup</h2>
-
           <p style={{ color: '#718096', marginBottom: '20px' }}>
             Ensure that cloud resources are efficiently managed and cleaned up post-deployment.
           </p>
-
           <button
-            onClick={() => alert('Cleanup feature will connect to Azure to remove unused resources')}
+            onClick={() => showNotification('Cleanup feature will connect to Azure to remove unused resources', 'info')}
             style={{
               padding: '15px 30px',
               background: '#E53E3E',
@@ -677,7 +668,6 @@ function App() {
           </button>
         </div>
 
-        {/* 2FA Verification Modal */}
         {showTwoFactorModal && (
           <div style={{
             position: 'fixed',
@@ -705,7 +695,6 @@ function App() {
               <p style={{ color: '#718096', marginBottom: '30px' }}>
                 Please enter your 6-digit code from Google Authenticator to complete login.
               </p>
-
               <div style={{ marginBottom: '20px' }}>
                 <label style={{
                   display: 'block',
@@ -733,7 +722,6 @@ function App() {
                   }}
                 />
               </div>
-
               <div style={{ display: 'flex', gap: '10px' }}>
                 <button
                   onClick={verify2FA}
@@ -772,7 +760,6 @@ function App() {
                   Cancel
                 </button>
               </div>
-
               <p style={{
                 marginTop: '20px',
                 fontSize: '14px',
@@ -786,7 +773,6 @@ function App() {
         )}
       </div>
 
-      {/* Footer */}
       <footer className="app-footer">
         <p>© 2025 Nutritional Insights. All Rights Reserved.</p>
       </footer>
