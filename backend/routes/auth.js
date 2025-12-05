@@ -2,6 +2,11 @@ const express = require('express');
 const router = express.Router();
 const { passport, generateToken } = require('../auth/google');
 
+// --- QUAN TRỌNG: Cấu hình địa chỉ Frontend trên Azure ---
+// Khi đăng nhập xong, Backend sẽ chuyển hướng (redirect) bạn về trang này.
+// Thay vì về localhost (máy cá nhân), ta về thẳng server Azure.
+const CLIENT_URL = "https://project3-backend-nutritional-bqhpd8ggbze8dhcj.canadacentral-01.azurewebsites.net";
+
 // GET /auth/google - Initiate Google OAuth
 router.get('/google', passport.authenticate('google', {
     scope: ['profile', 'email']
@@ -13,7 +18,8 @@ router.get(
     passport.authenticate('google', { failureRedirect: '/login' }),
     (req, res) => {
         const token = generateToken(req.user);
-        res.redirect(`http://localhost:3001/auth/success?token=${token}`);
+        // ĐÃ SỬA: Redirect về Azure thay vì localhost
+        res.redirect(`${CLIENT_URL}?token=${token}`);
     }
 );
 
@@ -28,7 +34,8 @@ router.get(
     passport.authenticate('github', { failureRedirect: '/login' }),
     (req, res) => {
         const token = generateToken(req.user);
-        res.redirect(`http://localhost:3001/auth/success?token=${token}`);
+        // ĐÃ SỬA: Redirect về Azure thay vì localhost
+        res.redirect(`${CLIENT_URL}?token=${token}`);
     }
 );
 
