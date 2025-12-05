@@ -13,7 +13,7 @@ router.get(
     passport.authenticate('google', { failureRedirect: '/login' }),
     (req, res) => {
         const token = generateToken(req.user);
-        res.redirect(`http://localhost:3000/auth/success?token=${token}`);
+        res.redirect(`http://localhost:3001/auth/success?token=${token}`);
     }
 );
 
@@ -28,7 +28,7 @@ router.get(
     passport.authenticate('github', { failureRedirect: '/login' }),
     (req, res) => {
         const token = generateToken(req.user);
-        res.redirect(`http://localhost:3000/auth/success?token=${token}`);
+        res.redirect(`http://localhost:3001/auth/success?token=${token}`);
     }
 );
 

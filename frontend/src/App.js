@@ -18,6 +18,11 @@ function App() {
   const [recipesData, setRecipesData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [filteredRecipes, setFilteredRecipes] = useState([]);
+  const [showTwoFactorModal, setShowTwoFactorModal] = useState(false);
+  const [twoFactorCode, setTwoFactorCode] = useState('');
+  const [tempToken, setTempToken] = useState('');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const dietTypes = ['All Diet Types', 'Vegan', 'Keto', 'Mediterranean', 'Dash', 'Paleo'];
 
@@ -37,16 +42,54 @@ function App() {
     }
   };
 
-  // Fetch recipes
+  // Fetch recipes - get ALL recipes (no pagination limit)
   const fetchRecipes = async () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`${API_BASE_URL}/recipes.json`);
+      const response = await fetch(`http://localhost:5000/api/recipes?limit=10000`);
       const data = await response.json();
       setRecipesData(data);
     } catch (err) {
       setError('Failed to fetch recipes');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Verify 2FA code
+  const verify2FA = async () => {
+    if (twoFactorCode.length !== 6) {
+      alert('Please enter a 6-digit code');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch('http://localhost:5000/api/2fa/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: 'user-oauth',
+          token: twoFactorCode
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.verified) {
+        // 2FA verified! Save token and authenticate
+        localStorage.setItem('authToken', tempToken);
+        setIsAuthenticated(true);
+        setShowTwoFactorModal(false);
+        setTwoFactorCode('');
+        alert('Successfully authenticated with 2FA!');
+      } else {
+        alert('Invalid 2FA code. Please try again.');
+      }
+    } catch (err) {
+      alert('2FA verification failed');
       console.error(err);
     } finally {
       setLoading(false);
@@ -59,7 +102,6 @@ function App() {
     setError(null);
     try {
       await fetch(`${API_BASE_URL}/clusters.json`);
-      // Just show success message for now
       alert('Clusters data loaded successfully!');
     } catch (err) {
       setError('Failed to fetch clusters');
@@ -73,6 +115,48 @@ function App() {
   useEffect(() => {
     fetchNutritionalInsights();
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Filter recipes when data, searchTerm, or selectedDietType changes
+  useEffect(() => {
+    if (!recipesData?.recipes) return;
+
+    let filtered = recipesData.recipes;
+
+    // Filter by diet type
+    if (selectedDietType !== 'All Diet Types') {
+      filtered = filtered.filter(recipe =>
+        recipe.diet_type === selectedDietType.toLowerCase()
+      );
+    }
+
+    // Filter by search term
+    if (searchTerm.trim()) {
+      filtered = filtered.filter(recipe =>
+        recipe.recipe_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        recipe.cuisine_type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        recipe.diet_type?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    setFilteredRecipes(filtered);
+  }, [recipesData, searchTerm, selectedDietType]);
+
+  // Handle OAuth callback and show 2FA modal
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+    const pendingOAuth = localStorage.getItem('pendingOAuth');
+
+    if (token && pendingOAuth) {
+      // OAuth successful, now require 2FA
+      setTempToken(token);
+      setShowTwoFactorModal(true);
+      localStorage.removeItem('pendingOAuth');
+
+      // Clean URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
   }, []);
 
   // Prepare chart data
@@ -161,7 +245,7 @@ function App() {
               </ResponsiveContainer>
             </div>
 
-            {/* Heatmap (using BarChart as approximation) */}
+            {/* Heatmap */}
             <div className="chart-card">
               <h3>Heatmap</h3>
               <p>Nutrient correlations.</p>
@@ -277,25 +361,106 @@ function App() {
           )}
         </section>
 
-        {/* Pagination */}
-        <section className="pagination-section">
-          <h2>Pagination</h2>
-          <div className="pagination">
-            <button
-              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-              disabled={currentPage === 1}
-            >
-              Previous
-            </button>
-            <button className="page-number active">{currentPage}</button>
-            <button className="page-number">{currentPage + 1}</button>
-            <button onClick={() => setCurrentPage(prev => prev + 1)}>
-              Next
-            </button>
-          </div>
+        {/* Filtered Recipes Display */}
+        <section className="recipes-section" style={{
+          margin: '40px 0',
+          padding: '30px',
+          background: 'white',
+          borderRadius: '12px',
+          boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+        }}>
+          <h2>Filtered Recipes ({filteredRecipes.length})</h2>
+
+          {loading && <p>Loading recipes...</p>}
+
+          {error && <p style={{ color: '#E53E3E' }}>{error}</p>}
+
+          {!loading && filteredRecipes.length === 0 && (
+            <p style={{ color: '#718096', textAlign: 'center', padding: '20px' }}>
+              No recipes found. Try different filters or click "Get Recipes" button.
+            </p>
+          )}
+
+          {filteredRecipes.length > 0 && (
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+              gap: '20px',
+              marginTop: '20px'
+            }}>
+              {filteredRecipes.slice(0, 12).map((recipe, index) => (
+                <div key={index} style={{
+                  padding: '20px',
+                  background: '#F7FAFC',
+                  borderRadius: '8px',
+                  border: '1px solid #E2E8F0'
+                }}>
+                  <h3 style={{
+                    fontSize: '18px',
+                    marginBottom: '10px',
+                    color: '#2D3748'
+                  }}>
+                    {recipe.recipe_name}
+                  </h3>
+                  <div style={{
+                    fontSize: '14px',
+                    color: '#718096',
+                    marginBottom: '8px'
+                  }}>
+                    <strong>Diet:</strong> {recipe.diet_type}
+                  </div>
+                  <div style={{
+                    fontSize: '14px',
+                    color: '#718096',
+                    marginBottom: '8px'
+                  }}>
+                    <strong>Cuisine:</strong> {recipe.cuisine_type}
+                  </div>
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(3, 1fr)',
+                    gap: '10px',
+                    marginTop: '12px',
+                    padding: '10px',
+                    background: 'white',
+                    borderRadius: '6px'
+                  }}>
+                    <div style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: '12px', color: '#A0AEC0' }}>Protein</div>
+                      <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#FF6B6B' }}>
+                        {recipe.protein_g?.toFixed(1)}g
+                      </div>
+                    </div>
+                    <div style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: '12px', color: '#A0AEC0' }}>Carbs</div>
+                      <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#4ECDC4' }}>
+                        {recipe.carbs_g?.toFixed(1)}g
+                      </div>
+                    </div>
+                    <div style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: '12px', color: '#A0AEC0' }}>Fat</div>
+                      <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#FFE66D' }}>
+                        {recipe.fat_g?.toFixed(1)}g
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {filteredRecipes.length > 12 && (
+            <p style={{
+              textAlign: 'center',
+              marginTop: '20px',
+              color: '#718096'
+            }}>
+              Showing 12 of {filteredRecipes.length} recipes
+            </p>
+          )}
         </section>
 
-        {/* Project 3: Security & Compliance Section */}
+        {/* Security & Compliance Section */}
         <div style={{
           margin: '40px 0',
           padding: '30px',
@@ -346,7 +511,7 @@ function App() {
           </div>
         </div>
 
-        {/* Project 3: OAuth & 2FA Integration */}
+        {/* OAuth & 2FA Integration */}
         <div style={{
           margin: '40px 0',
           padding: '30px',
@@ -360,7 +525,10 @@ function App() {
             <h3 style={{ fontSize: '18px', marginBottom: '15px' }}>Secure Login</h3>
             <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
               <button
-                onClick={() => window.location.href = 'http://localhost:5000/auth/google'}
+                onClick={() => {
+                  localStorage.setItem('pendingOAuth', 'google');
+                  window.location.href = 'http://localhost:5000/auth/google';
+                }}
                 style={{
                   padding: '12px 24px',
                   background: '#4285F4',
@@ -375,7 +543,10 @@ function App() {
                 Login with Google
               </button>
               <button
-                onClick={() => window.location.href = 'http://localhost:5000/auth/github'}
+                onClick={() => {
+                  localStorage.setItem('pendingOAuth', 'github');
+                  window.location.href = 'http://localhost:5000/auth/github';
+                }}
                 style={{
                   padding: '12px 24px',
                   background: '#333',
@@ -393,38 +564,54 @@ function App() {
           </div>
 
           <div style={{ marginTop: '30px' }}>
-            <h3 style={{ fontSize: '18px', marginBottom: '15px' }}>Enter 2FA Code</h3>
-            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-              <input
-                type="text"
-                placeholder="Enter your 2FA code"
-                maxLength="6"
-                style={{
-                  padding: '12px',
-                  fontSize: '18px',
-                  letterSpacing: '5px',
-                  textAlign: 'center',
-                  border: '2px solid #E2E8F0',
-                  borderRadius: '8px',
-                  width: '200px'
+            <h3 style={{ fontSize: '18px', marginBottom: '15px' }}>Setup 2FA</h3>
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+              <button
+                onClick={async () => {
+                  try {
+                    const response = await fetch('http://localhost:5000/api/2fa/generate', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        userId: 'user-oauth',
+                        userEmail: 'your-email@example.com'
+                      })
+                    });
+                    const data = await response.json();
+
+                    const qrWindow = window.open('', '_blank', 'width=400,height=500');
+                    qrWindow.document.write(`
+                      <html>
+                        <head><title>2FA QR Code</title></head>
+                        <body style="text-align: center; padding: 20px; font-family: Arial;">
+                          <h2>Scan with Google Authenticator</h2>
+                          <img src="${data.qrCode}" style="width: 300px; height: 300px;" />
+                          <p>Secret: ${data.secret}</p>
+                        </body>
+                      </html>
+                    `);
+                  } catch (err) {
+                    alert('Failed to generate QR code');
+                  }
                 }}
-              />
-              <button style={{
-                padding: '12px 24px',
-                background: '#38A169',
-                color: 'white',
-                border: 'none',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                fontSize: '16px'
-              }}>
-                Verify
+                style={{
+                  padding: '12px 24px',
+                  background: '#6B46C1',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontSize: '16px',
+                  fontWeight: '500'
+                }}
+              >
+                Generate QR Code
               </button>
             </div>
           </div>
         </div>
 
-        {/* Project 3: Cloud Resource Cleanup */}
+        {/* Cloud Resource Cleanup */}
         <div style={{
           margin: '40px 0',
           padding: '30px',
@@ -454,6 +641,114 @@ function App() {
             Clean Up Resources
           </button>
         </div>
+
+        {/* 2FA Verification Modal */}
+        {showTwoFactorModal && (
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0,0,0,0.7)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 1000
+          }}>
+            <div style={{
+              background: 'white',
+              padding: '40px',
+              borderRadius: '12px',
+              maxWidth: '500px',
+              width: '90%',
+              boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
+            }}>
+              <h2 style={{ marginBottom: '10px', color: '#2D3748' }}>
+                Two-Factor Authentication Required
+              </h2>
+              <p style={{ color: '#718096', marginBottom: '30px' }}>
+                Please enter your 6-digit code from Google Authenticator to complete login.
+              </p>
+
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{
+                  display: 'block',
+                  marginBottom: '10px',
+                  fontWeight: '500',
+                  color: '#2D3748'
+                }}>
+                  Enter 2FA Code:
+                </label>
+                <input
+                  type="text"
+                  value={twoFactorCode}
+                  onChange={(e) => setTwoFactorCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  placeholder="000000"
+                  maxLength="6"
+                  style={{
+                    width: '100%',
+                    padding: '15px',
+                    fontSize: '24px',
+                    letterSpacing: '10px',
+                    textAlign: 'center',
+                    border: '2px solid #E2E8F0',
+                    borderRadius: '8px',
+                    fontWeight: 'bold'
+                  }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button
+                  onClick={verify2FA}
+                  disabled={loading || twoFactorCode.length !== 6}
+                  style={{
+                    flex: 1,
+                    padding: '15px',
+                    background: twoFactorCode.length === 6 ? '#38A169' : '#A0AEC0',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    cursor: twoFactorCode.length === 6 ? 'pointer' : 'not-allowed',
+                    fontSize: '16px',
+                    fontWeight: '500'
+                  }}
+                >
+                  {loading ? 'Verifying...' : 'Verify & Login'}
+                </button>
+                <button
+                  onClick={() => {
+                    setShowTwoFactorModal(false);
+                    setTwoFactorCode('');
+                    setTempToken('');
+                  }}
+                  style={{
+                    padding: '15px 30px',
+                    background: '#E53E3E',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    fontSize: '16px',
+                    fontWeight: '500'
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+
+              <p style={{
+                marginTop: '20px',
+                fontSize: '14px',
+                color: '#718096',
+                textAlign: 'center'
+              }}>
+                Don't have 2FA set up? Use the "Setup 2FA" section above to generate a QR code first.
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Footer */}
@@ -463,7 +758,5 @@ function App() {
     </div>
   );
 }
-
-
 
 export default App;
