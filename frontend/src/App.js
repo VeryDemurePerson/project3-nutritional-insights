@@ -22,7 +22,7 @@ function App() {
   const [showTwoFactorModal, setShowTwoFactorModal] = useState(false);
   const [twoFactorCode, setTwoFactorCode] = useState('');
   const [tempToken, setTempToken] = useState('');
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
 
   const dietTypes = ['All Diet Types', 'Vegan', 'Keto', 'Mediterranean', 'Dash', 'Paleo'];
 
