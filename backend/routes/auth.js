@@ -4,29 +4,27 @@ const router = express.Router();
 const { passport, generateToken } = require('../auth/google');
 
 // --- SỬA LỖI Ở ĐÂY ---
-// Thay vì localhost, chúng ta trỏ về Frontend trên Azure
-const FRONTEND_URL = "https://project3-backend-nutritional-bqhpd8ggbze8dhcj.canadacentral-01.azurewebsites.net";
+// Đây là địa chỉ trang web của bạn trên Azure
+const FRONTEND_URL = "https://purple-ocean-0b078a80f.3.azurestaticapps.net";
+// Lưu ý: Mình lấy link từ ảnh "Static Web App" bạn gửi (purple-ocean...). 
+// Nếu link web frontend của bạn khác, hãy thay vào đây nhé!
 
-// 1. Route bắt đầu đăng nhập Google
+// 1. Google Auth
 router.get('/google', passport.authenticate('google', {
     scope: ['profile', 'email']
 }));
 
-// 2. Route nhận kết quả từ Google (Callback)
 router.get(
     '/google/callback',
     passport.authenticate('google', { failureRedirect: '/login' }),
     (req, res) => {
-        // Tạo token cho user
         const token = generateToken(req.user);
-
-        // QUAN TRỌNG: Redirect về Azure, KHÔNG PHẢI localhost
-        // Token được gắn vào URL để Frontend lấy ra dùng
+        // QUAN TRỌNG: Chuyển hướng về Azure, KHÔNG VỀ LOCALHOST
         res.redirect(`${FRONTEND_URL}?token=${token}`);
     }
 );
 
-// 3. Route GitHub (Sửa tương tự)
+// 2. GitHub Auth
 router.get('/github', passport.authenticate('github', {
     scope: ['user:email']
 }));
@@ -40,12 +38,20 @@ router.get(
     }
 );
 
-// 4. Logout
+// 3. Logout
 router.get('/logout', (req, res) => {
     req.logout((err) => {
         if (err) return res.status(500).json({ success: false, error: 'Logout failed' });
         res.json({ success: true, message: 'Logged out successfully' });
     });
+});
+
+// 4. Get User
+router.get('/me', (req, res) => {
+    if (!req.user) {
+        return res.status(401).json({ success: false, error: 'Not authenticated' });
+    }
+    res.json({ success: true, user: req.user });
 });
 
 module.exports = router;
