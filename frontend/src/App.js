@@ -552,7 +552,21 @@ function App() {
                       const data = await response.json();
 
                       if (data.success) {
-                        setQrCodeData(data);
+                        // ✅ CONVERT BASE64 → BLOB URL
+                        const base64Data = data.qrCode.split(',')[1]; // Remove "data:image/png;base64,"
+                        const binaryString = window.atob(base64Data);
+                        const bytes = new Uint8Array(binaryString.length);
+                        for (let i = 0; i < binaryString.length; i++) {
+                          bytes[i] = binaryString.charCodeAt(i);
+                        }
+                        const blob = new Blob([bytes], { type: 'image/png' });
+                        const blobUrl = URL.createObjectURL(blob);
+
+                        // Save blob URL instead of base64
+                        setQrCodeData({
+                          ...data,
+                          qrCode: blobUrl  // Use blob URL instead of base64
+                        });
                         showNotification('QR Code generated! Scan with Google Authenticator', 'success');
                       } else {
                         showNotification('Failed to generate QR code', 'error');
