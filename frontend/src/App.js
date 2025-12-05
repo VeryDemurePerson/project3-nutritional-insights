@@ -7,9 +7,7 @@ import {
 } from 'recharts';
 
 // --- CẤU HÌNH SERVER ---
-// Địa chỉ gốc của Server Azure
 const SERVER_URL = "https://project3-backend-nutritional-bqhpd8ggbze8dhcj.canadacentral-01.azurewebsites.net";
-// Địa chỉ cho các API lấy dữ liệu (có thêm /api)
 const API_BASE_URL = `${SERVER_URL}/api`;
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
@@ -17,7 +15,6 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 function App() {
   const [selectedDietType, setSelectedDietType] = useState('All Diet Types');
   const [searchTerm, setSearchTerm] = useState('');
-
   const [nutritionalData, setNutritionalData] = useState(null);
   const [recipesData, setRecipesData] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -27,24 +24,22 @@ function App() {
   const [twoFactorCode, setTwoFactorCode] = useState('');
   const [tempToken, setTempToken] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  // State mới để thay thế alert() bằng thông báo đẹp hơn
   const [notification, setNotification] = useState(null);
+
+  // ✅ THÊM STATE MỚI CHO QR CODE
+  const [qrCodeData, setQrCodeData] = useState(null);
 
   const dietTypes = ['All Diet Types', 'Vegan', 'Keto', 'Mediterranean', 'Dash', 'Paleo'];
 
-  // Helper để hiện thông báo thay cho alert
   const showNotification = (message, type = 'info') => {
     setNotification({ message, type });
     setTimeout(() => setNotification(null), 3000);
   };
 
-  // Fetch nutritional insights
   const fetchNutritionalInsights = async () => {
     setLoading(true);
     setError(null);
     try {
-      // Đã sửa: Xóa đuôi .json
       const response = await fetch(`${API_BASE_URL}/nutritional-insights`);
       if (!response.ok) throw new Error('Network response was not ok');
       const data = await response.json();
@@ -57,25 +52,22 @@ function App() {
     }
   };
 
-  // Fetch recipes
   const fetchRecipes = async () => {
     setLoading(true);
     setError(null);
     try {
-      // Đã sửa: Giảm limit xuống 100 để không bị timeout
       const response = await fetch(`${API_BASE_URL}/recipes?limit=100`);
       if (!response.ok) throw new Error('Network response was not ok');
       const data = await response.json();
       setRecipesData(data);
     } catch (err) {
-      setError('Failed to fetch recipes. Ensure Backend is running.');
+      setError('Failed to fetch recipes');
       console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
-  // Verify 2FA code
   const verify2FA = async () => {
     if (twoFactorCode.length !== 6) {
       showNotification('Please enter a 6-digit code', 'error');
@@ -84,7 +76,6 @@ function App() {
 
     setLoading(true);
     try {
-      // Endpoint này giữ nguyên logic cũ
       const response = await fetch(`${API_BASE_URL}/2fa/verify`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -113,12 +104,10 @@ function App() {
     }
   };
 
-  // Fetch clusters
   const fetchClusters = async () => {
     setLoading(true);
     setError(null);
     try {
-      // Đã sửa: Xóa đuôi .json
       await fetch(`${API_BASE_URL}/clusters`);
       showNotification('Clusters data loaded successfully!', 'success');
     } catch (err) {
@@ -129,16 +118,12 @@ function App() {
     }
   };
 
-  // Auto-fetch on component mount
   useEffect(() => {
     fetchNutritionalInsights();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Filter recipes logic
   useEffect(() => {
     if (!recipesData?.recipes) return;
-
     let filtered = recipesData.recipes;
 
     if (selectedDietType !== 'All Diet Types') {
@@ -158,7 +143,6 @@ function App() {
     setFilteredRecipes(filtered);
   }, [recipesData, searchTerm, selectedDietType]);
 
-  // Handle OAuth callback
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('token');
@@ -172,7 +156,6 @@ function App() {
     }
   }, []);
 
-  // Chart preparation functions
   const prepareBarChartData = () => {
     if (!nutritionalData) return [];
     return Object.entries(nutritionalData.average_macronutrients || {}).map(([diet, values]) => ({
@@ -213,7 +196,6 @@ function App() {
 
   return (
     <div className="App">
-      {/* Notification Toast */}
       {notification && (
         <div style={{
           position: 'fixed',
@@ -224,8 +206,7 @@ function App() {
           color: 'white',
           borderRadius: '8px',
           boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-          zIndex: 2000,
-          animation: 'slideIn 0.3s ease-out'
+          zIndex: 2000
         }}>
           {notification.message}
         </div>
@@ -236,6 +217,7 @@ function App() {
       </header>
 
       <div className="main-content">
+        {/* CHARTS - Giữ nguyên */}
         <section className="explore-section">
           <h2>Explore Nutritional Insights</h2>
           <div className="charts-grid">
@@ -257,7 +239,7 @@ function App() {
             </div>
             <div className="chart-card">
               <h3>Scatter Plot</h3>
-              <p>Nutrient relationships (e.g., protein vs carbs).</p>
+              <p>Nutrient relationships.</p>
               <ResponsiveContainer width="100%" height={250}>
                 <ScatterChart>
                   <CartesianGrid strokeDasharray="3 3" />
@@ -310,6 +292,7 @@ function App() {
           </div>
         </section>
 
+        {/* FILTERS - Giữ nguyên */}
         <section className="filters-section">
           <h2>Filters and Data Interaction</h2>
           <div className="filter-controls">
@@ -339,34 +322,21 @@ function App() {
           </div>
         </section>
 
+        {/* API INTERACTION - Giữ nguyên */}
         <section className="api-section">
           <h2>API Data Interaction</h2>
           <div className="api-buttons">
-            <button
-              onClick={fetchNutritionalInsights}
-              disabled={loading}
-              className="api-button primary"
-            >
+            <button onClick={fetchNutritionalInsights} disabled={loading} className="api-button primary">
               {loading ? 'Loading...' : 'Get Nutritional Insights'}
             </button>
-            <button
-              onClick={fetchRecipes}
-              disabled={loading}
-              className="api-button success"
-            >
+            <button onClick={fetchRecipes} disabled={loading} className="api-button success">
               {loading ? 'Loading...' : 'Get Recipes'}
             </button>
-            <button
-              onClick={fetchClusters}
-              disabled={loading}
-              className="api-button info"
-            >
+            <button onClick={fetchClusters} disabled={loading} className="api-button info">
               {loading ? 'Loading...' : 'Get Clusters'}
             </button>
           </div>
-
           {error && <div className="error-message">{error}</div>}
-
           {nutritionalData && (
             <div className="data-display">
               <h3>Nutritional Data:</h3>
@@ -376,6 +346,7 @@ function App() {
           )}
         </section>
 
+        {/* FILTERED RECIPES - Giữ nguyên code cũ... */}
         <section className="recipes-section" style={{
           margin: '40px 0',
           padding: '30px',
@@ -405,25 +376,13 @@ function App() {
                   borderRadius: '8px',
                   border: '1px solid #E2E8F0'
                 }}>
-                  <h3 style={{
-                    fontSize: '18px',
-                    marginBottom: '10px',
-                    color: '#2D3748'
-                  }}>
+                  <h3 style={{ fontSize: '18px', marginBottom: '10px', color: '#2D3748' }}>
                     {recipe.recipe_name}
                   </h3>
-                  <div style={{
-                    fontSize: '14px',
-                    color: '#718096',
-                    marginBottom: '8px'
-                  }}>
+                  <div style={{ fontSize: '14px', color: '#718096', marginBottom: '8px' }}>
                     <strong>Diet:</strong> {recipe.diet_type}
                   </div>
-                  <div style={{
-                    fontSize: '14px',
-                    color: '#718096',
-                    marginBottom: '8px'
-                  }}>
+                  <div style={{ fontSize: '14px', color: '#718096', marginBottom: '8px' }}>
                     <strong>Cuisine:</strong> {recipe.cuisine_type}
                   </div>
                   <div style={{
@@ -459,16 +418,13 @@ function App() {
             </div>
           )}
           {filteredRecipes.length > 12 && (
-            <p style={{
-              textAlign: 'center',
-              marginTop: '20px',
-              color: '#718096'
-            }}>
+            <p style={{ textAlign: 'center', marginTop: '20px', color: '#718096' }}>
               Showing 12 of {filteredRecipes.length} recipes
             </p>
           )}
         </section>
 
+        {/* SECURITY - Giữ nguyên */}
         <div style={{
           margin: '40px 0',
           padding: '30px',
@@ -484,33 +440,15 @@ function App() {
               gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
               gap: '20px'
             }}>
-              <div style={{
-                padding: '15px',
-                background: '#F7FAFC',
-                borderRadius: '8px',
-                display: 'flex',
-                justifyContent: 'space-between'
-              }}>
+              <div style={{ padding: '15px', background: '#F7FAFC', borderRadius: '8px', display: 'flex', justifyContent: 'space-between' }}>
                 <span>Encryption:</span>
                 <span style={{ color: '#38A169', fontWeight: 'bold' }}>Enabled</span>
               </div>
-              <div style={{
-                padding: '15px',
-                background: '#F7FAFC',
-                borderRadius: '8px',
-                display: 'flex',
-                justifyContent: 'space-between'
-              }}>
+              <div style={{ padding: '15px', background: '#F7FAFC', borderRadius: '8px', display: 'flex', justifyContent: 'space-between' }}>
                 <span>Access Control:</span>
                 <span style={{ color: '#38A169', fontWeight: 'bold' }}>Secure</span>
               </div>
-              <div style={{
-                padding: '15px',
-                background: '#F7FAFC',
-                borderRadius: '8px',
-                display: 'flex',
-                justifyContent: 'space-between'
-              }}>
+              <div style={{ padding: '15px', background: '#F7FAFC', borderRadius: '8px', display: 'flex', justifyContent: 'space-between' }}>
                 <span>Compliance:</span>
                 <span style={{ color: '#38A169', fontWeight: 'bold' }}>GDPR Compliant</span>
               </div>
@@ -518,6 +456,7 @@ function App() {
           </div>
         </div>
 
+        {/* ✅ OAUTH & 2FA - ĐÃ SỬA! */}
         <div style={{
           margin: '40px 0',
           padding: '30px',
@@ -558,7 +497,6 @@ function App() {
                 <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
                   <button
                     onClick={() => {
-                      // Đã sửa: Dùng SERVER_URL (gốc) cho Auth
                       window.location.href = `${SERVER_URL}/auth/google`;
                       localStorage.setItem('pendingOAuth', 'google');
                     }}
@@ -577,7 +515,6 @@ function App() {
                   </button>
                   <button
                     onClick={() => {
-                      // Đã sửa: Dùng SERVER_URL (gốc) cho Auth
                       window.location.href = `${SERVER_URL}/auth/github`;
                       localStorage.setItem('pendingOAuth', 'github');
                     }}
@@ -597,56 +534,87 @@ function App() {
                 </div>
               </div>
 
+              {/* ✅ QR CODE SECTION - ĐÃ SỬA ĐỂ HIỂN THỊ TRONG PAGE! */}
               <div style={{ marginTop: '30px' }}>
                 <h3 style={{ fontSize: '18px', marginBottom: '15px' }}>Setup 2FA</h3>
-                <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
-                  <button
-                    onClick={async () => {
-                      try {
-                        const response = await fetch(`${API_BASE_URL}/2fa/generate`, {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({
-                            userId: 'user-oauth',
-                            userEmail: 'your-email@example.com'
-                          })
-                        });
-                        const data = await response.json();
+                <button
+                  onClick={async () => {
+                    try {
+                      setLoading(true);
+                      const response = await fetch(`${API_BASE_URL}/2fa/generate`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          userId: 'user-oauth',
+                          userEmail: 'your-email@example.com'
+                        })
+                      });
+                      const data = await response.json();
 
-                        const qrWindow = window.open('', '_blank', 'width=400,height=500');
-                        qrWindow.document.write(`
-                          <html>
-                            <head><title>2FA QR Code</title></head>
-                            <body style="text-align: center; padding: 20px; font-family: Arial;">
-                              <h2>Scan with Google Authenticator</h2>
-                              <img src="${data.qrCode}" style="width: 300px; height: 300px;" />
-                              <p>Secret: ${data.secret}</p>
-                            </body>
-                          </html>
-                        `);
-                      } catch (err) {
+                      if (data.success) {
+                        setQrCodeData(data);
+                        showNotification('QR Code generated! Scan with Google Authenticator', 'success');
+                      } else {
                         showNotification('Failed to generate QR code', 'error');
                       }
-                    }}
-                    style={{
-                      padding: '12px 24px',
-                      background: '#6B46C1',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '8px',
-                      cursor: 'pointer',
-                      fontSize: '16px',
-                      fontWeight: '500'
-                    }}
-                  >
-                    Generate QR Code
-                  </button>
-                </div>
+                    } catch (err) {
+                      showNotification('Failed to generate QR code', 'error');
+                      console.error(err);
+                    } finally {
+                      setLoading(false);
+                    }
+                  }}
+                  disabled={loading}
+                  style={{
+                    padding: '12px 24px',
+                    background: loading ? '#A0AEC0' : '#6B46C1',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    cursor: loading ? 'not-allowed' : 'pointer',
+                    fontSize: '16px',
+                    fontWeight: '500'
+                  }}
+                >
+                  {loading ? 'Generating...' : 'Generate QR Code'}
+                </button>
+
+                {/* ✅ HIỂN THỊ QR CODE NGAY TRONG PAGE! */}
+                {qrCodeData && (
+                  <div style={{
+                    marginTop: '20px',
+                    padding: '20px',
+                    background: '#F7FAFC',
+                    borderRadius: '8px',
+                    textAlign: 'center'
+                  }}>
+                    <h4 style={{ marginBottom: '15px' }}>Scan with Google Authenticator</h4>
+                    <img
+                      src={qrCodeData.qrCode}
+                      alt="2FA QR Code"
+                      style={{
+                        width: '300px',
+                        height: '300px',
+                        border: '2px solid #E2E8F0',
+                        borderRadius: '8px'
+                      }}
+                    />
+                    <p style={{
+                      marginTop: '15px',
+                      fontSize: '14px',
+                      color: '#718096',
+                      wordBreak: 'break-all'
+                    }}>
+                      <strong>Secret:</strong> {qrCodeData.secret}
+                    </p>
+                  </div>
+                )}
               </div>
             </>
           )}
         </div>
 
+        {/* CLOUD CLEANUP - Giữ nguyên */}
         <div style={{
           margin: '40px 0',
           padding: '30px',
@@ -659,7 +627,7 @@ function App() {
             Ensure that cloud resources are efficiently managed and cleaned up post-deployment.
           </p>
           <button
-            onClick={() => showNotification('Cleanup feature will connect to Azure to remove unused resources', 'info')}
+            onClick={() => showNotification('Cleanup feature will connect to Azure', 'info')}
             style={{
               padding: '15px 30px',
               background: '#E53E3E',
@@ -675,6 +643,7 @@ function App() {
           </button>
         </div>
 
+        {/* 2FA MODAL - Giữ nguyên */}
         {showTwoFactorModal && (
           <div style={{
             position: 'fixed',
